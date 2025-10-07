@@ -1170,8 +1170,8 @@ const App = () => {
                   <a href="mailto:amin29199@gmail.com" className="text-[#3C79FF] hover:text-[#71F5FF] transition-colors">
                     <Mail size={24} />
                   </a>
-                  <a href="#" className="text-[#3C79FF] hover:text-[#71F5FF] transition-colors">
-                    <ExternalLink size={24} />
+                  <a href="https://www.linkedin.com/in/mustapha-amin-dhouib/" className="text-[#3C79FF] hover:text-[#71F5FF] transition-colors">
+                    <ExternalLink size={24} /> Founder Linkedin
                   </a>
                 </div>
               </Grid>
