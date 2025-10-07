@@ -476,11 +476,11 @@ const App = () => {
                 ))}
               </div>
               
-              <div className="pt-12 animate-bounce">
+              {/* <div className="pt-12 animate-bounce">
                 <IconButton className="text-[#3C79FF]">
                   <ChevronDown size={40} />
                 </IconButton>
-              </div>
+              </div> */}
             </div>
           </Container>
         </section>
@@ -1041,7 +1041,7 @@ const App = () => {
                 </GlowCard>
               </Grid>
               
-              <Grid item xs={12} md={6}>
+              {/* <Grid item xs={12} md={6}>
                 <GlowCard glowColor="#A033FF">
                   <div className="bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-10 rounded-2xl border-2 border-[#A033FF]/30 h-full">
                     <h3 className="text-3xl font-bold mb-8">Return Scenarios <span className="text-xl text-gray-400">(3-year hold)</span></h3>
@@ -1075,7 +1075,7 @@ const App = () => {
                     </div>
                   </div>
                 </GlowCard>
-              </Grid>
+              </Grid> */}
             </Grid>
           </Container>
         </section>
