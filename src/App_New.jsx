@@ -1182,7 +1182,7 @@ const App = () => {
                   <li>• Pre-seed closes: Mid-February 2025</li>
                   <li>• MVP Launch: Month 8</li>
                   <li>• Seed Raise: Month 9</li>
-                  <li>• Production Launch: Q3 2025</li>
+                  {/* <li>• Production Launch: Q3 2025</li> */}
                 </ul>
               </Grid>
               
