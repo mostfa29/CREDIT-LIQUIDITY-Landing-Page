@@ -1176,15 +1176,7 @@ const App = () => {
                 </div>
               </Grid>
               
-              <Grid item xs={12} md={4}>
-                <h4 className="text-lg font-bold mb-4 text-[#71F5FF]">Timeline</h4>
-                <ul className="space-y-2 text-gray-400">
-                  <li>• Pre-seed closes: Mid-February 2025</li>
-                  <li>• MVP Launch: Month 8</li>
-                  <li>• Seed Raise: Month 9</li>
-                  {/* <li>• Production Launch: Q3 2025</li> */}
-                </ul>
-              </Grid>
+ 
               
               <Grid item xs={12} md={4}>
                 <h4 className="text-lg font-bold mb-4 text-[#71F5FF]">Legal</h4>
