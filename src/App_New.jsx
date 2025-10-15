@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Button, Container, Typography, Box, Grid, Card, CardContent, Chip, LinearProgress, IconButton } from '@mui/material';
+import React, { useState, useEffect, useRef } from 'react';
+import { Button, Container, Typography, Box, Grid, Card, CardContent, Chip, IconButton } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { TrendingUp, Shield, Zap, Code, Users, CheckCircle, AlertCircle, ArrowRight, ExternalLink, Mail, ChevronDown, Database, Lock, Globe, Sparkles } from 'lucide-react';
-import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
-import Logo from './logo.png';
+import { TrendingUp, Shield, Zap, Code, Users, CheckCircle, AlertCircle, ArrowRight, ExternalLink, Mail, ChevronDown, Database, Lock, Globe, Sparkles, Activity, Target } from 'lucide-react';
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import * as THREE from 'three';
 
 const theme = createTheme({
@@ -34,7 +33,6 @@ const ThreeJSBackground = () => {
     renderer.setClearColor(0x0A092A, 1);
     mountRef.current.appendChild(renderer.domElement);
     
-    // Create particle system
     const particlesGeometry = new THREE.BufferGeometry();
     const particlesCount = 2000;
     const posArray = new Float32Array(particlesCount * 3);
@@ -56,7 +54,6 @@ const ThreeJSBackground = () => {
     const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
     scene.add(particlesMesh);
     
-    // Create glowing spheres
     const sphereGeometry = new THREE.SphereGeometry(2, 32, 32);
     const sphereMaterial = new THREE.MeshBasicMaterial({
       color: 0xA033FF,
@@ -72,7 +69,6 @@ const ThreeJSBackground = () => {
     sphere2.position.set(15, -10, -20);
     scene.add(sphere2);
     
-    // Add lights
     const light1 = new THREE.PointLight(0x3C79FF, 2, 100);
     light1.position.set(-15, 10, -10);
     scene.add(light1);
@@ -124,12 +120,14 @@ const ThreeJSBackground = () => {
     return () => {
       window.removeEventListener('resize', handleResize);
       document.removeEventListener('mousemove', onMouseMove);
-      mountRef.current?.removeChild(renderer.domElement);
+      if (mountRef.current) {
+        mountRef.current.removeChild(renderer.domElement);
+      }
       renderer.dispose();
     };
   }, []);
   
-  return <div ref={mountRef} className="fixed top-0 left-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }} />;
+  return <div ref={mountRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0 }} />;
 };
 
 // Animated Counter
@@ -164,8 +162,8 @@ const AnimatedCounter = ({ end, duration = 2000, suffix = '', prefix = '' }) => 
   return <span ref={ref}>{prefix}{count}{suffix}</span>;
 };
 
-// Glowing Card with Hover Effect
-const GlowCard = ({ children, className = '', glowColor = '#3C79FF' }) => {
+// Glowing Card
+const GlowCard = ({ children, glowColor = '#3C79FF' }) => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
   
@@ -179,26 +177,28 @@ const GlowCard = ({ children, className = '', glowColor = '#3C79FF' }) => {
   
   return (
     <div
-      className={`relative overflow-hidden ${className}`}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       style={{
+        position: 'relative',
+        overflow: 'hidden',
         transform: isHovered ? 'translateY(-8px)' : 'translateY(0)',
         transition: 'transform 0.3s ease'
       }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {isHovered && (
         <div
-          className="absolute pointer-events-none"
           style={{
+            position: 'absolute',
             left: mousePosition.x,
             top: mousePosition.y,
             width: '300px',
             height: '300px',
             background: `radial-gradient(circle, ${glowColor}40 0%, transparent 70%)`,
             transform: 'translate(-50%, -50%)',
-            transition: 'opacity 0.3s ease'
+            transition: 'opacity 0.3s ease',
+            pointerEvents: 'none'
           }}
         />
       )}
@@ -207,117 +207,13 @@ const GlowCard = ({ children, className = '', glowColor = '#3C79FF' }) => {
   );
 };
 
-// Market Growth Chart
-const MarketGrowthChart = () => {
-  const data = [
-    { year: '2024', value: 20, projection: 20 },
-    { year: '2025', value: 35, projection: 40 },
-    { year: '2026', value: 50, projection: 80 },
-    { year: '2027', value: 80, projection: 150 },
-    { year: '2028', value: 120, projection: 250 },
-    { year: '2029', value: 200, projection: 380 },
-    { year: '2030', value: 320, projection: 500 }
-  ];
-  
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <AreaChart data={data}>
-        <defs>
-          <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#3C79FF" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#3C79FF" stopOpacity={0}/>
-          </linearGradient>
-          <linearGradient id="colorProjection" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#A033FF" stopOpacity={0.8}/>
-            <stop offset="95%" stopColor="#A033FF" stopOpacity={0}/>
-          </linearGradient>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#3C79FF20" />
-        <XAxis dataKey="year" stroke="#FFFFFF60" />
-        <YAxis stroke="#FFFFFF60" />
-        <Tooltip 
-          contentStyle={{ 
-            backgroundColor: '#1a1847', 
-            border: '1px solid #3C79FF',
-            borderRadius: '8px'
-          }}
-        />
-        <Area type="monotone" dataKey="value" stroke="#3C79FF" fillOpacity={1} fill="url(#colorValue)" strokeWidth={3} />
-        <Area type="monotone" dataKey="projection" stroke="#A033FF" fillOpacity={1} fill="url(#colorProjection)" strokeWidth={3} strokeDasharray="5 5" />
-      </AreaChart>
-    </ResponsiveContainer>
-  );
-};
-
-// Revenue Chart
-const RevenueChart = () => {
-  const data = [
-    { year: 'Y1', revenue: 1.85, ebitda: -1.59 },
-    { year: 'Y2', revenue: 7.5, ebitda: 0.2 },
-    { year: 'Y3', revenue: 23.5, ebitda: 5.45 },
-    { year: 'Y4', revenue: 38, ebitda: 12.5 },
-    { year: 'Y5', revenue: 52.5, ebitda: 20.85 }
-  ];
-  
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#3C79FF20" />
-        <XAxis dataKey="year" stroke="#FFFFFF60" />
-        <YAxis stroke="#FFFFFF60" />
-        <Tooltip 
-          contentStyle={{ 
-            backgroundColor: '#1a1847', 
-            border: '1px solid #3C79FF',
-            borderRadius: '8px'
-          }}
-          formatter={(value) => `$${value}M`}
-        />
-        <Line type="monotone" dataKey="revenue" stroke="#3C79FF" strokeWidth={3} dot={{ fill: '#3C79FF', r: 6 }} />
-        <Line type="monotone" dataKey="ebitda" stroke="#71F5FF" strokeWidth={3} dot={{ fill: '#71F5FF', r: 6 }} />
-      </LineChart>
-    </ResponsiveContainer>
-  );
-};
-
-// Competitive Analysis Radar
-const CompetitiveRadar = () => {
-  const data = [
-    { metric: 'Speed', us: 95, competitors: 40 },
-    { metric: 'Accuracy', us: 98, competitors: 75 },
-    { metric: 'Coverage', us: 90, competitors: 30 },
-    { metric: 'Cost', us: 85, competitors: 45 },
-    { metric: 'Compliance', us: 100, competitors: 60 }
-  ];
-  
-  return (
-    <ResponsiveContainer width="100%" height={300}>
-      <RadarChart data={data}>
-        <PolarGrid stroke="#3C79FF40" />
-        <PolarAngleAxis dataKey="metric" stroke="#FFFFFF80" />
-        <PolarRadiusAxis stroke="#FFFFFF40" />
-        <Radar name="CreditLiquidity" dataKey="us" stroke="#3C79FF" fill="#3C79FF" fillOpacity={0.6} strokeWidth={2} />
-        <Radar name="Competitors" dataKey="competitors" stroke="#FF4444" fill="#FF4444" fillOpacity={0.3} strokeWidth={2} />
-        <Tooltip 
-          contentStyle={{ 
-            backgroundColor: '#1a1847', 
-            border: '1px solid #3C79FF',
-            borderRadius: '8px'
-          }}
-        />
-      </RadarChart>
-    </ResponsiveContainer>
-  );
-};
-
-// Floating Elements
-const FloatingElement = ({ children, delay = 0, duration = 3 }) => {
+// Floating Element
+const FloatingElement = ({ children, delay = 0 }) => {
   return (
     <div
-      className="animate-float"
       style={{
-        animationDelay: `${delay}s`,
-        animationDuration: `${duration}s`
+        animation: `float 3s ease-in-out infinite`,
+        animationDelay: `${delay}s`
       }}
     >
       {children}
@@ -327,23 +223,9 @@ const FloatingElement = ({ children, delay = 0, duration = 3 }) => {
 
 // Main Component
 const App = () => {
-  const [scrollY, setScrollY] = useState(0);
-  
-  useEffect(() => {
-    const handleScroll = () => setScrollY(window.scrollY);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-  
   const openWhitepaper = () => {
-    window.open('https://docs.google.com/document/d/1wbPb2OW_-BKtR0HtDCcnBP7JpfW2x4JVS5DdRd7RzWQ/edit?usp=sharing', '_blank');
+    window.open('https://docs.google.com/document/d/1uEg_QXsAXNQYN9Mwq-FStjlH-q0BBHYq1TcTFBZWvKk/edit?usp=sharing', '_blank');
   };
-
-  const openPitchDeck = () => {
-    window.open('https://drive.google.com/file/d/1Y8pJQnmpgv-aN3wD3LMzeazA55saxi0E/view?usp=sharing', '_blank');
-  };
-
-  
 
   return (
     <ThemeProvider theme={theme}>
@@ -351,9 +233,6 @@ const App = () => {
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }
-        }
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
         }
         @keyframes fadeInUp {
           from {
@@ -372,43 +251,42 @@ const App = () => {
           0%, 100% { box-shadow: 0 0 20px rgba(60, 121, 255, 0.5); }
           50% { box-shadow: 0 0 40px rgba(60, 121, 255, 0.8); }
         }
-        .pulse-glow {
-          animation: pulse-glow 2s ease-in-out infinite;
-        }
         @keyframes gradient-shift {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
-        .gradient-shift {
+        .gradient-text {
+          background: linear-gradient(90deg, #3C79FF, #71F5FF, #A033FF, #3C79FF);
           background-size: 200% 200%;
           animation: gradient-shift 3s ease infinite;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
       `}</style>
       
-      <div className="relative min-h-screen bg-[#0A092A] text-white overflow-hidden">
-        
+      <div style={{ position: 'relative', minHeight: '100vh', background: '#0A092A', color: 'white', overflow: 'hidden' }}>
         <ThreeJSBackground />
 
         {/* Hero Section */}
-        <section className="relative min-h-screen flex items-center justify-center px-4 pt-20">
-
-          <Container maxWidth="lg" className="relative z-10">
-
-            <div className="text-center space-y-1">
+        <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '80px 20px' }}>
+          <Container maxWidth="lg" style={{ position: 'relative', zIndex: 10 }}>
+            <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '32px' }}>
               
               <div className="animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0 }}>
-                <FloatingElement delay={0}>
-                                    <img 
-                    src={Logo} 
-                    alt="CreditLiquidity Logo" 
-                    className="mx-auto "
-                    style={{height:"200px", width:"200px"}}
-                  />
-                  <div className="inline-block px-6 py-3 bg-gradient-to-r from-[#3C79FF]/20 to-[#A033FF]/20 border border-[#3C79FF]/50 rounded-full mb-6 pulse-glow">
-                    <span className="text-[#71F5FF] text-sm font-semibold flex items-center gap-2">
+                <FloatingElement>
+                  <div style={{ 
+                    display: 'inline-block', 
+                    padding: '12px 24px', 
+                    background: 'linear-gradient(90deg, rgba(60, 121, 255, 0.2), rgba(160, 51, 255, 0.2))', 
+                    border: '1px solid rgba(60, 121, 255, 0.5)', 
+                    borderRadius: '50px',
+                    animation: 'pulse-glow 2s ease-in-out infinite'
+                  }}>
+                    <span style={{ color: '#71F5FF', fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <Sparkles size={16} />
-                      Building the Future of Credit Infrastructure
+                      Transparent Credit Intelligence for On-Chain Finance
                       <Sparkles size={16} />
                     </span>
                   </div>
@@ -416,314 +294,239 @@ const App = () => {
               </div>
               
               <div className="animate-fade-in-up" style={{ animationDelay: '0.2s', opacity: 0 }}>
-                <h1 className="text-6xl md:text-8xl font-bold leading-tight gradient-shift bg-gradient-to-r from-white via-[#71F5FF] via-[#3C79FF] to-[#A033FF] bg-clip-text text-transparent">
-                  The Independent Valuation Layer for Tokenized Credit
+                <h1 className="gradient-text" style={{ fontSize: 'clamp(48px, 8vw, 96px)', fontWeight: 'bold', lineHeight: 1.1, margin: 0 }}>
+                  DataLiquidity Network
                 </h1>
               </div>
               
               <div className="animate-fade-in-up" style={{ animationDelay: '0.3s', opacity: 0 }}>
-                <p className="text-2xl md:text-3xl text-gray-300 max-w-4xl mx-auto font-light">
-                  Real-time, audit-grade credit analysis that unlocks{' '}
-                  <span className="text-[#3C79FF] font-bold">$500B</span> in institutional capital
+                <p style={{ fontSize: 'clamp(20px, 3vw, 32px)', color: '#B8B5D1', maxWidth: '900px', margin: '0 auto', fontWeight: 300 }}>
+                  Bringing institutional-grade credit assessments to decentralized lending
                 </p>
               </div>
               
               <div className="animate-fade-in-up" style={{ animationDelay: '0.4s', opacity: 0 }}>
-                <p className="text-lg text-gray-400 max-w-3xl mx-auto leading-relaxed">
-                  Protocols have yields. Institutions have capital. But auditors reject protocol-provided valuations. 
-                  We're the <span className="text-[#A033FF] font-semibold">compliance infrastructure layer</span> that bridges the gap.
+                <p style={{ fontSize: '18px', color: '#8B89A0', maxWidth: '800px', margin: '0 auto', lineHeight: 1.6 }}>
+                  Verifiable credit ratings delivered in under 60 seconds. Using decentralized validators and cryptographic proofs to deliver transparent credit intelligence that institutions trust and auditors accept.
                 </p>
               </div>
               
-              <div className="animate-fade-in-up flex flex-col sm:flex-row gap-6 justify-center pt-8" style={{ animationDelay: '0.5s', opacity: 0 }}>
+              <div className="animate-fade-in-up" style={{ display: 'flex', gap: '24px', justifyContent: 'center', flexWrap: 'wrap', animationDelay: '0.5s', opacity: 0, marginTop: '16px' }}>
                 <Button 
                   variant="contained" 
                   size="large"
                   onClick={openWhitepaper}
-                  className="bg-gradient-to-r from-[#3C79FF] to-[#A033FF] hover:from-[#3C79FF]/90 hover:to-[#A033FF]/90 px-10 py-5 text-lg font-bold shadow-xl shadow-[#3C79FF]/50 transform transition-all hover:scale-105"
+                  style={{ 
+                    background: 'linear-gradient(90deg, #3C79FF, #A033FF)', 
+                    padding: '16px 40px', 
+                    fontSize: '18px', 
+                    fontWeight: 'bold',
+                    boxShadow: '0 8px 32px rgba(60, 121, 255, 0.5)',
+                    transition: 'transform 0.3s ease',
+                    textTransform: 'none'
+                  }}
                   endIcon={<ExternalLink size={22} />}
+                  onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                  onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                 >
-                  Read the Whitepaper
+                  Read Whitepaper
                 </Button>
                 <Button 
                   variant="outlined" 
                   size="large"
-                  className="border-2 border-[#3C79FF] text-[#3C79FF] hover:bg-[#3C79FF]/20 px-10 py-5 text-lg font-bold transform transition-all hover:scale-105"
-                  onClick={openPitchDeck}
-
-                  endIcon={<ArrowRight size={22} />}
+                  href="mailto:amin29199@gmail.com"
+                  style={{ 
+                    border: '2px solid #3C79FF', 
+                    color: '#3C79FF', 
+                    padding: '16px 40px', 
+                    fontSize: '18px', 
+                    fontWeight: 'bold',
+                    transition: 'all 0.3s ease',
+                    textTransform: 'none'
+                  }}
+                  endIcon={<Mail size={22} />}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(60, 121, 255, 0.2)';
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'transparent';
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
                 >
-                  Request Pitch Deck
+                  Get in Touch
                 </Button>
               </div>
               
-              <div className="pt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                {[
-                  { value: 120, suffix: '+', label: 'Institutional Interviews', color: '#3C79FF' },
-                  { value: 73, suffix: '%', label: 'Cite Valuation as #1 Blocker', color: '#A033FF' },
-                  { value: 52, suffix: '%', label: 'Willing to Pay $150K/Year', color: '#71F5FF' }
-                ].map((stat, i) => (
-                  <FloatingElement key={i} delay={i * 0.2} duration={3 + i}>
-                    <GlowCard glowColor={stat.color}>
-                      <div className="bg-gradient-to-br from-[#1a1847]/80 to-[#0A092A]/50 backdrop-blur-xl p-8 rounded-2xl border border-[#3C79FF]/30 hover:border-[#3C79FF] transition-all">
-                        <div className="text-5xl font-bold mb-3" style={{ color: stat.color }}>
-                          <AnimatedCounter end={stat.value} suffix={stat.suffix} />
-                        </div>
-                        <div className="text-sm text-gray-300 font-medium">{stat.label}</div>
-                      </div>
-                    </GlowCard>
-                  </FloatingElement>
-                ))}
+              <div style={{ marginTop: '64px' }}>
+                <Grid container spacing={4}>
+                  {[
+                    { value: '2.95', suffix: 'T', label: 'Target Volume (Year 5)', color: '#3C79FF' },
+                    { value: '60', suffix: 's', label: 'Assessment Finality', color: '#71F5FF' },
+                    { value: '89.3', suffix: '%', label: 'Model Accuracy', color: '#A033FF' }
+                  ].map((stat, i) => (
+                    <Grid item xs={12} md={4} key={i}>
+                      <FloatingElement delay={i * 0.2}>
+                        <GlowCard glowColor={stat.color}>
+                          <div style={{ 
+                            background: 'linear-gradient(135deg, rgba(26, 24, 71, 0.8), rgba(10, 9, 42, 0.5))', 
+                            backdropFilter: 'blur(20px)', 
+                            padding: '32px', 
+                            borderRadius: '16px', 
+                            border: '1px solid rgba(60, 121, 255, 0.3)',
+                            transition: 'border-color 0.3s ease'
+                          }}>
+                            <div style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '8px', color: stat.color }}>
+                              <AnimatedCounter end={parseFloat(stat.value)} suffix={stat.suffix} />
+                            </div>
+                            <div style={{ fontSize: '14px', color: '#B8B5D1', fontWeight: 500 }}>{stat.label}</div>
+                          </div>
+                        </GlowCard>
+                      </FloatingElement>
+                    </Grid>
+                  ))}
+                </Grid>
               </div>
-              
-              {/* <div className="pt-12 animate-bounce">
-                <IconButton className="text-[#3C79FF]">
-                  <ChevronDown size={40} />
-                </IconButton>
-              </div> */}
             </div>
           </Container>
         </section>
 
         {/* Problem Section */}
-        <section className="relative py-32 px-4 bg-gradient-to-b from-transparent via-[#1a1847]/20 to-transparent">
-          <Container maxWidth="lg" className="relative z-10">
-            <div className="text-center mb-20">
-              <FloatingElement>
-                <h2 className="text-6xl font-bold mb-6">
-                  <span className="text-[#3C79FF]">$20B</span> Market.{' '}
-                  <span className="gradient-shift bg-gradient-to-r from-[#FF4444] to-[#FFA033] bg-clip-text text-transparent">
-                    One Critical Blocker.
-                  </span>
-                </h2>
-              </FloatingElement>
-              <p className="text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                Tokenized credit hit $20B TVL, but institutional allocators can't deploy capital. 
-                The problem isn't yields, regulation, or technology risk.{' '}
-                <span className="text-[#A033FF] font-bold text-3xl">It's audit compliance.</span>
+        <section style={{ position: 'relative', padding: '128px 20px', background: 'linear-gradient(180deg, transparent, rgba(26, 24, 71, 0.2), transparent)' }}>
+          <Container maxWidth="lg" style={{ position: 'relative', zIndex: 10 }}>
+            <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+              <h2 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 'bold', marginBottom: '24px' }}>
+                The Credit Market <span style={{ color: '#FF4444' }}>Problem</span>
+              </h2>
+              <p style={{ fontSize: '24px', color: '#B8B5D1', maxWidth: '900px', margin: '0 auto', lineHeight: 1.6 }}>
+                Traditional credit rating agencies operate as black boxes. As trillions in credit moves on-chain, the old system won't work. <span style={{ color: '#3C79FF', fontWeight: 'bold' }}>We're building that infrastructure.</span>
               </p>
             </div>
             
-            <Grid container spacing={6}>
+            <Grid container spacing={4}>
               {[
                 {
-                  icon: <AlertCircle size={48} />,
-                  emoji: '❌',
-                  title: 'Protocol-Provided NAVs',
-                  problem: 'Auditors reject them',
-                  detail: 'Conflict of interest: borrowers valuing their own collateral',
-                  color: '#FF4444',
-                  gradient: 'from-[#FF4444]/20 to-[#FF4444]/5'
+                  title: 'Secret Methodology',
+                  description: 'Traditional agencies keep their methods hidden. No transparency, no accountability.',
+                  icon: <Lock size={40} />
                 },
                 {
-                  icon: <TrendingUp size={48} />,
-                  emoji: '❌',
-                  title: 'Internal Models',
-                  problem: 'Cost $200-400K annually',
-                  detail: 'Still need external validation. Don\'t scale beyond 1,000 loans',
-                  color: '#FFA033',
-                  gradient: 'from-[#FFA033]/20 to-[#FFA033]/5'
+                  title: 'Conflicts of Interest',
+                  description: 'Paid by the entities they rate. Remember 2008? The track record speaks for itself.',
+                  icon: <AlertCircle size={40} />
                 },
                 {
-                  icon: <Shield size={48} />,
-                  emoji: '❌',
-                  title: 'Traditional Bureaus',
-                  problem: 'Zero tokenized coverage',
-                  detail: '60-90 day lags. Built for quarterly reporting, not 24/7 markets',
-                  color: '#FF33A0',
-                  gradient: 'from-[#FF33A0]/20 to-[#FF33A0]/5'
+                  title: 'Institutional Barriers',
+                  description: 'DeFi protocols need transparent assessments. Institutions need verifiable data. Regulators need accountability.',
+                  icon: <Shield size={40} />
                 }
               ].map((item, index) => (
                 <Grid item xs={12} md={4} key={index}>
-                  <GlowCard glowColor={item.color}>
-                    <div className={`bg-gradient-to-br ${item.gradient} backdrop-blur-xl p-10 rounded-2xl border-2 border-[#3C79FF]/20 hover:border-[#3C79FF] h-full transition-all duration-500`}>
-                      <div className="flex items-center gap-4 mb-6">
-                        <div className="text-5xl">{item.emoji}</div>
-                        <div style={{ color: item.color }}>{item.icon}</div>
+                  <GlowCard glowColor="#3C79FF">
+                    <div style={{ 
+                      background: 'linear-gradient(135deg, rgba(26, 24, 71, 0.9), rgba(10, 9, 42, 0.7))', 
+                      backdropFilter: 'blur(20px)', 
+                      padding: '40px', 
+                      borderRadius: '16px', 
+                      border: '2px solid rgba(60, 121, 255, 0.2)',
+                      height: '100%',
+                      transition: 'border-color 0.5s ease'
+                    }}>
+                      <div style={{ color: '#3C79FF', marginBottom: '24px' }}>
+                        {item.icon}
                       </div>
-                      <h3 className="text-2xl font-bold mb-4 text-white">{item.title}</h3>
-                      <p className="text-xl font-bold mb-4" style={{ color: item.color }}>{item.problem}</p>
-                      <p className="text-gray-300 leading-relaxed">{item.detail}</p>
+                      <h3 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>{item.title}</h3>
+                      <p style={{ color: '#B8B5D1', lineHeight: 1.6 }}>{item.description}</p>
                     </div>
                   </GlowCard>
                 </Grid>
               ))}
             </Grid>
-            
-            <div className="mt-20">
-              <GlowCard glowColor="#3C79FF">
-                <div className="p-10 bg-gradient-to-r from-[#3C79FF]/20 via-[#A033FF]/20 to-[#3C79FF]/20 border-l-8 border-[#3C79FF] rounded-2xl backdrop-blur-xl">
-                  <p className="text-3xl italic text-gray-100 font-light mb-6 leading-relaxed">
-                    "CFOs aren't blocking capital because they don't trust crypto — they can't pass audit."
-                  </p>
-                  <p className="text-lg text-[#71F5FF] font-semibold">
-                    — Institutional Allocator, $4.2B AUM
-                  </p>
-                </div>
-              </GlowCard>
-            </div>
           </Container>
         </section>
 
-        {/* Solution Section */}
-        <section className="relative py-32 px-4">
-          <Container maxWidth="lg" className="relative z-10">
-            <div className="text-center mb-20">
-              <h2 className="text-6xl font-bold mb-6">
-                Decentralized Credit Oracle.{' '}
-                <span className="gradient-shift bg-gradient-to-r from-[#3C79FF] via-[#71F5FF] to-[#A033FF] bg-clip-text text-transparent">
-                  Institutional-Grade.
-                </span>
+        {/* How It Works */}
+        <section style={{ position: 'relative', padding: '128px 20px' }}>
+          <Container maxWidth="lg" style={{ position: 'relative', zIndex: 10 }}>
+            <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+              <h2 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 'bold', marginBottom: '24px' }}>
+                How It <span className="gradient-text">Works</span>
               </h2>
-              <p className="text-2xl text-gray-300 max-w-4xl mx-auto">
-                <span className="text-[#3C79FF] font-bold">AI</span> +{' '}
-                <span className="text-[#A033FF] font-bold">Human Validators</span> +{' '}
-                <span className="text-[#71F5FF] font-bold">Byzantine Consensus</span> ={' '}
-                Real-time marks that pass Basel III/Solvency II audit
+              <p style={{ fontSize: '24px', color: '#B8B5D1', maxWidth: '900px', margin: '0 auto' }}>
+                Decentralized Validation + Cryptographic Proof
               </p>
             </div>
             
-            <Grid container spacing={6}>
-              {[
-                {
-                  icon: <Code size={40} />,
-                  emoji: '🤖',
-                  title: 'Specialized AI Agents',
-                  metric: '91-93%',
-                  description: 'accuracy per credit type (CRE, Invoice, Consumer). Fine-tuned on 3,000+ historical loans. Not generic models — credit-specialized.',
-                  gradient: 'from-[#3C79FF] to-[#71F5FF]',
-                  delay: 0
-                },
-                {
-                  icon: <Users size={40} />,
-                  emoji: '👥',
-                  title: 'Professional Validators',
-                  metric: '98%+',
-                  description: 'Credit analysts (CFA, CPA, CRA credentials) review edge cases. Final accuracy: 98%+. Auditors trust human oversight.',
-                  gradient: 'from-[#A033FF] to-[#FF33A0]',
-                  delay: 0.2
-                },
-                {
-                  icon: <Zap size={40} />,
-                  emoji: '⚡',
-                  title: 'Byzantine Consensus',
-                  metric: '4-15 min',
-                  description: '8 validators. 6 must agree. Slashing for bad actors. Result on-chain in 4-15 minutes.',
-                  gradient: 'from-[#71F5FF] to-[#3C79FF]',
-                  delay: 0.4
-                },
-                {
-                  icon: <CheckCircle size={40} />,
-                  emoji: '✅',
-                  title: 'Basel III Compliant',
-                  metric: '100%',
-                  description: 'Daily fair value marks. External validation. Audit-ready documentation. Zero conflicts of interest.',
-                  gradient: 'from-[#A033FF] to-[#3C79FF]',
-                  delay: 0.6
-                }
-              ].map((item, index) => (
-                <Grid item xs={12} md={6} key={index}>
-                  <FloatingElement delay={item.delay} duration={3.5}>
-                    <GlowCard glowColor={item.gradient.split(' ')[0].replace('from-[', '').replace(']', '')}>
-                      <div className={`bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-10 rounded-2xl border-2 border-[#3C79FF]/30 hover:border-[#3C79FF] h-full transition-all duration-500`}>
-                        <div className="flex items-center gap-4 mb-6">
-                          <div className="text-6xl">{item.emoji}</div>
-                          <div className={`text-transparent bg-gradient-to-r ${item.gradient} bg-clip-text`}>
-                            {item.icon}
-                          </div>
-                        </div>
-                        <h3 className="text-3xl font-bold mb-4">{item.title}</h3>
-                        <div className={`text-5xl font-bold mb-6 gradient-shift bg-gradient-to-r ${item.gradient} bg-clip-text text-transparent`}>
-                          {item.metric}
-                        </div>
-                        <p className="text-gray-300 text-lg leading-relaxed">{item.description}</p>
-                      </div>
-                    </GlowCard>
-                  </FloatingElement>
-                </Grid>
-              ))}
-            </Grid>
-            
-            {/* <div className="mt-16 text-center">
-              <Button 
-                variant="contained"
-                size="large"
-                className="bg-gradient-to-r from-[#3C79FF] to-[#A033FF] px-12 py-4 text-xl font-bold shadow-2xl shadow-[#3C79FF]/60 transform transition-all hover:scale-110"
-                endIcon={<ArrowRight size={24} />}
-              >
-                See How It Works
-              </Button>
-            </div> */}
-          </Container>
-        </section>
-
-        {/* How It Works Section */}
-        <section className="relative py-32 px-4 bg-gradient-to-b from-transparent via-[#1a1847]/30 to-transparent">
-          <Container maxWidth="lg" className="relative z-10">
-            <div className="text-center mb-20">
-              <h2 className="text-6xl font-bold mb-6">
-                Query to Result in{' '}
-                <span className="gradient-shift bg-gradient-to-r from-[#71F5FF] to-[#3C79FF] bg-clip-text text-transparent">
-                  15 Minutes
-                </span>
-              </h2>
-            </div>
-            
-            <div className="space-y-12">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
               {[
                 {
                   step: '1',
-                  title: 'Submit Query',
+                  title: 'Data Collection',
+                  description: 'Credit data pulled from established sources (CoreLogic, Dun & Bradstreet, public records) with cryptographic authentication.',
                   icon: <Database size={48} />,
-                  detail: 'Protocol pays $1.50 (stablecoin or $DATA with 20% discount). Loan details, collateral info, borrower data.',
-                  color: '#3C79FF',
-                  position: 'left'
+                  color: '#3C79FF'
                 },
                 {
                   step: '2',
-                  title: 'Parallel Processing',
-                  icon: <Zap size={48} />,
-                  detail: '8 validators process simultaneously. AI analyzes → Human reviews edge cases. 85% auto-approved, 12% quick review, 3% deep analysis.',
-                  color: '#71F5FF',
-                  position: 'right'
+                  title: 'Validator Network',
+                  description: 'Independent validators analyze data using our AI model. Each validator stakes significant capital—they lose money if wrong.',
+                  icon: <Users size={48} />,
+                  color: '#71F5FF'
                 },
                 {
                   step: '3',
-                  title: 'Byzantine Consensus',
-                  icon: <Lock size={48} />,
-                  detail: '6 of 8 must agree (within 10% range). Outliers penalized. Fraud slashed. No single point of failure.',
-                  color: '#A033FF',
-                  position: 'left'
+                  title: 'Consensus',
+                  description: 'Multiple validators must agree. Outliers are penalized. No single validator controls the outcome.',
+                  icon: <Activity size={48} />,
+                  color: '#A033FF'
                 },
                 {
                   step: '4',
-                  title: 'On-Chain Publication',
+                  title: 'Proof Generation',
+                  description: 'Cryptographic proof created showing correct assessment—without revealing proprietary model details.',
+                  icon: <Lock size={48} />,
+                  color: '#FF33A0'
+                },
+                {
+                  step: '5',
+                  title: 'Cross-Chain Publication',
+                  description: 'Assessment published across Ethereum, Base, Polygon, Arbitrum for universal access.',
                   icon: <Globe size={48} />,
-                  detail: 'Credit score + Fair value + Risk factors + Confidence interval. Immutable. Audit-ready.',
-                  color: '#FF33A0',
-                  position: 'right'
+                  color: '#71F5FF'
                 }
               ].map((item, index) => (
-                <FloatingElement key={index} delay={index * 0.3} duration={4}>
-                  <div className={`flex items-center gap-8 ${item.position === 'right' ? 'flex-row-reverse' : ''}`}>
-                    <GlowCard glowColor={item.color} className="flex-1">
-                      <div className="bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-10 rounded-2xl border-2 border-[#3C79FF]/30 hover:border-[#3C79FF] transition-all duration-500">
-                        <div className="flex items-center gap-6 mb-6">
-                          <div 
-                            className="w-20 h-20 rounded-full flex items-center justify-center font-bold text-3xl shadow-2xl"
-                            style={{ 
-                              background: `linear-gradient(135deg, ${item.color}, ${item.color}80)`,
-                              boxShadow: `0 0 40px ${item.color}80`
-                            }}
-                          >
-                            {item.step}
-                          </div>
+                <FloatingElement key={index} delay={index * 0.2}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '32px', flexDirection: index % 2 === 0 ? 'row' : 'row-reverse' }}>
+                    <div style={{ 
+                      minWidth: '80px',
+                      height: '80px',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      background: `linear-gradient(135deg, ${item.color}, ${item.color}80)`,
+                      fontSize: '32px',
+                      fontWeight: 'bold',
+                      boxShadow: `0 0 40px ${item.color}80`
+                    }}>
+                      {item.step}
+                    </div>
+                    <GlowCard glowColor={item.color}>
+                      <div style={{ 
+                        flex: 1,
+                        background: 'linear-gradient(135deg, rgba(26, 24, 71, 0.9), rgba(10, 9, 42, 0.7))', 
+                        backdropFilter: 'blur(20px)', 
+                        padding: '32px', 
+                        borderRadius: '16px', 
+                        border: '2px solid rgba(60, 121, 255, 0.3)'
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
                           <div style={{ color: item.color }}>
                             {item.icon}
                           </div>
+                          <h3 style={{ fontSize: '28px', fontWeight: 'bold', margin: 0 }}>{item.title}</h3>
                         </div>
-                        <h3 className="text-3xl font-bold mb-4">{item.title}</h3>
-                        <p className="text-gray-300 text-lg leading-relaxed">{item.detail}</p>
+                        <p style={{ color: '#B8B5D1', fontSize: '18px', lineHeight: 1.6, margin: 0 }}>{item.description}</p>
                       </div>
                     </GlowCard>
                   </div>
@@ -731,15 +534,16 @@ const App = () => {
               ))}
             </div>
             
-            <div className="mt-20 text-center">
-              <GlowCard glowColor="#71F5FF">
-                <div className="bg-gradient-to-r from-[#71F5FF]/20 to-[#3C79FF]/20 p-10 rounded-2xl border-2 border-[#71F5FF]/50">
-                  <p className="text-3xl font-bold text-white mb-4">
-                    Real-time marks vs{' '}
-                    <span className="text-[#FF4444]">60-90 day</span> industry standard
-                  </p>
-                  <p className="text-xl text-gray-300">
-                    Mission-critical infrastructure for institutional compliance
+            <div style={{ marginTop: '64px', textAlign: 'center' }}>
+              <GlowCard glowColor="#3C79FF">
+                <div style={{ 
+                  background: 'linear-gradient(90deg, rgba(60, 121, 255, 0.2), rgba(160, 51, 255, 0.2))', 
+                  padding: '40px', 
+                  borderRadius: '16px', 
+                  border: '2px solid rgba(60, 121, 255, 0.5)'
+                }}>
+                  <p style={{ fontSize: '28px', fontWeight: 'bold', margin: 0 }}>
+                    <span className="gradient-text">Result:</span> Credit scores you can verify, delivered in under 60 seconds
                   </p>
                 </div>
               </GlowCard>
@@ -747,141 +551,89 @@ const App = () => {
           </Container>
         </section>
 
-        {/* Market Section with Chart */}
-        <section className="relative py-32 px-4">
-          <Container maxWidth="lg" className="relative z-10">
-            <div className="text-center mb-20">
-              <h2 className="text-6xl font-bold mb-6">
-                <span className="text-[#3C79FF]">$137M</span> Infrastructure Opportunity
-              </h2>
-            </div>
-            
-            <Grid container spacing={8}>
-              <Grid item xs={12} md={6}>
+        {/* For Protocols/Validators/Institutions */}
+        <section style={{ position: 'relative', padding: '128px 20px', background: 'linear-gradient(180deg, transparent, rgba(26, 24, 71, 0.3), transparent)' }}>
+          <Container maxWidth="lg" style={{ position: 'relative', zIndex: 10 }}>
+            <Grid container spacing={6}>
+              <Grid item xs={12} md={4}>
                 <GlowCard glowColor="#3C79FF">
-                  <div className="bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-10 rounded-2xl border-2 border-[#3C79FF]/30 h-full">
-                    <h3 className="text-3xl font-bold mb-8">Market Sizing</h3>
-                    
-                    <div className="space-y-8">
-                      <div>
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-2xl font-bold text-[#3C79FF]">Today</span>
-                          <span className="text-4xl font-bold text-[#3C79FF]">$25.3M</span>
-                        </div>
-                        <ul className="space-y-2 text-gray-300">
-                          <li>• 18 lending protocols &gt;$50M TVL</li>
-                          <li>• 25 institutional allocators</li>
-                          <li>• 15 infrastructure providers</li>
-                        </ul>
-                      </div>
-                      
-                      <div className="h-px bg-gradient-to-r from-transparent via-[#3C79FF] to-transparent" />
-                      
-                      <div>
-                        <div className="flex items-center justify-between mb-4">
-                          <span className="text-2xl font-bold text-[#A033FF]">2030</span>
-                          <span className="text-4xl font-bold text-[#A033FF]">$137.8M</span>
-                        </div>
-                        <ul className="space-y-2 text-gray-300">
-                          <li>• Tokenized credit → $500B (BCG)</li>
-                          <li>• 3-4× customer growth</li>
-                          <li>• 30-50% ACV increase</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                </GlowCard>
-              </Grid>
-              
-              <Grid item xs={12} md={6}>
-                <GlowCard glowColor="#A033FF">
-                  <div className="bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-10 rounded-2xl border-2 border-[#A033FF]/30 h-full">
-                    <h3 className="text-3xl font-bold mb-8">Growth Trajectory</h3>
-                    <MarketGrowthChart />
-                    <p className="text-gray-300 text-center mt-6 text-lg">
-                      <span className="text-[#3C79FF] font-bold">Blue:</span> Current Market | 
-                      <span className="text-[#A033FF] font-bold"> Purple:</span> Projected Growth
-                    </p>
+                  <div style={{ 
+                    background: 'linear-gradient(135deg, rgba(26, 24, 71, 0.9), rgba(10, 9, 42, 0.7))', 
+                    backdropFilter: 'blur(20px)', 
+                    padding: '40px', 
+                    borderRadius: '16px', 
+                    border: '2px solid rgba(113, 245, 255, 0.3)',
+                    height: '100%'
+                  }}>
+                    <Shield size={48} style={{ color: '#71F5FF', marginBottom: '24px' }} />
+                    <h3 style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '16px' }}>For Institutions</h3>
+                    <p style={{ color: '#B8B5D1', fontSize: '16px', marginBottom: '24px' }}>Basel III-Compliant Infrastructure</p>
+                    <ul style={{ color: '#8B89A0', fontSize: '15px', lineHeight: 2, listStyle: 'none', padding: 0 }}>
+                      <li>✓ Portfolio risk assessment</li>
+                      <li>✓ Regulatory compliance ready</li>
+                      <li>✓ Cryptographic audit trails</li>
+                      <li>✓ White-label options</li>
+                      <li>✓ SLA guarantees available</li>
+                    </ul>
                   </div>
                 </GlowCard>
               </Grid>
             </Grid>
-            
-            <div className="mt-16">
-              <GlowCard glowColor="#71F5FF">
-                <div className="bg-gradient-to-r from-[#3C79FF]/20 to-[#A033FF]/20 p-10 rounded-2xl border-2 border-[#71F5FF]/30">
-                  <h3 className="text-3xl font-bold mb-6 text-[#71F5FF]">The Reality</h3>
-                  <p className="text-2xl text-gray-200 leading-relaxed">
-                    Every tokenized loan needs independent valuation. Auditors mandate external sources. 
-                    CFOs can't deploy capital without us.
-                  </p>
-                  <p className="text-xl text-[#3C79FF] font-bold mt-6">
-                    We're building that layer before Chainlink or Bloomberg prioritize it.
-                  </p>
-                </div>
-              </GlowCard>
-            </div>
           </Container>
         </section>
 
-        {/* Traction Section */}
-        <section className="relative py-32 px-4 bg-gradient-to-b from-transparent via-[#1a1847]/30 to-transparent">
-          <Container maxWidth="lg" className="relative z-10">
-            <div className="text-center mb-20">
-              <h2 className="text-6xl font-bold mb-6">
-                Technical Feasibility:{' '}
-                <span className="gradient-shift bg-gradient-to-r from-[#00FF00] to-[#71F5FF] bg-clip-text text-transparent">
-                  Proven
-                </span>
+        {/* Technology Section */}
+        <section style={{ position: 'relative', padding: '128px 20px' }}>
+          <Container maxWidth="lg" style={{ position: 'relative', zIndex: 10 }}>
+            <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+              <h2 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 'bold', marginBottom: '24px' }}>
+                Built for <span className="gradient-text">Institutional Standards</span>
               </h2>
-              <p className="text-2xl text-gray-300">
-                Not Raising to Prove Feasibility — Raising to <span className="text-[#3C79FF] font-bold">Implement</span>
-              </p>
             </div>
             
-            <Grid container spacing={6}>
+            <Grid container spacing={4}>
               {[
                 {
-                  icon: <CheckCircle size={48} />,
-                  title: 'AI Validated',
-                  metric: '92.4%',
-                  detail: 'accuracy on 3,000+ historical loans. Cost: $0.08/query vs $35-50 human analyst.',
-                  color: '#00FF00'
+                  title: 'AI Models',
+                  description: 'Trained on 284K+ historical credit transactions',
+                  icon: <Zap size={40} />,
+                  color: '#3C79FF'
                 },
-                // {
-                //   icon: <CheckCircle size={48} />,
-                //   title: 'Consensus Proven',
-                //   metric: '100%',
-                //   detail: 'success rate across 10,000 testnet simulations. Byzantine fault tolerance operational.',
-                //   color: '#3C79FF'
-                // },
                 {
-                  icon: <CheckCircle size={48} />,
-                  title: 'Customer Discovery',
-                  metric: '120',
-                  detail: 'structured interviews (10× typical pre-seed). 52% willing to pay $150K/year for non-existent product.',
+                  title: 'Zero-Knowledge Proofs',
+                  description: 'Verify assessments without exposing model IP',
+                  icon: <Lock size={40} />,
                   color: '#A033FF'
                 },
                 {
-                  icon: <CheckCircle size={48} />,
-                  title: 'Cost Advantage',
-                  metric: '60-75%',
-                  detail: 'cheaper than comparable oracle infrastructure. $1.50/query at production scale.',
+                  title: 'Byzantine Consensus',
+                  description: 'No single validator can manipulate scores',
+                  icon: <CheckCircle size={40} />,
                   color: '#71F5FF'
+                },
+                {
+                  title: 'Cross-Chain Oracle',
+                  description: 'Assessments usable across major blockchains',
+                  icon: <Globe size={40} />,
+                  color: '#FF33A0'
                 }
               ].map((item, index) => (
                 <Grid item xs={12} md={6} key={index}>
-                  <FloatingElement delay={index * 0.2} duration={3.5}>
+                  <FloatingElement delay={index * 0.15}>
                     <GlowCard glowColor={item.color}>
-                      <div className="bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-10 rounded-2xl border-2 border-[#3C79FF]/30 hover:border-[#3C79FF] h-full transition-all duration-500">
-                        <div className="flex items-center gap-4 mb-6" style={{ color: item.color }}>
+                      <div style={{ 
+                        background: 'linear-gradient(135deg, rgba(26, 24, 71, 0.9), rgba(10, 9, 42, 0.7))', 
+                        backdropFilter: 'blur(20px)', 
+                        padding: '40px', 
+                        borderRadius: '16px', 
+                        border: '2px solid rgba(60, 121, 255, 0.3)',
+                        height: '100%'
+                      }}>
+                        <div style={{ color: item.color, marginBottom: '20px' }}>
                           {item.icon}
                         </div>
-                        <h3 className="text-3xl font-bold mb-4">{item.title}</h3>
-                        <div className="text-6xl font-bold mb-6" style={{ color: item.color }}>
-                          {item.metric}
-                        </div>
-                        <p className="text-gray-300 text-lg leading-relaxed">{item.detail}</p>
+                        <h3 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '12px' }}>{item.title}</h3>
+                        <p style={{ color: '#B8B5D1', fontSize: '16px', lineHeight: 1.6 }}>{item.description}</p>
                       </div>
                     </GlowCard>
                   </FloatingElement>
@@ -889,14 +641,16 @@ const App = () => {
               ))}
             </Grid>
             
-            <div className="mt-16">
+            <div style={{ marginTop: '64px', textAlign: 'center' }}>
               <GlowCard glowColor="#3C79FF">
-                <div className="bg-gradient-to-r from-[#3C79FF]/20 to-[#A033FF]/20 p-10 rounded-2xl border-2 border-[#3C79FF]/50">
-                  <p className="text-2xl font-bold text-white mb-4">
-                    Pipeline: <span className="text-[#71F5FF]">7 active discussions</span> with protocols + institutions
-                  </p>
-                  <p className="text-xl text-gray-300">
-                    Planning assumes <span className="text-[#FF4444] font-bold">zero convert</span> (conservative base case)
+                <div style={{ 
+                  background: 'linear-gradient(90deg, rgba(60, 121, 255, 0.2), rgba(160, 51, 255, 0.2))', 
+                  padding: '40px', 
+                  borderRadius: '16px', 
+                  border: '2px solid rgba(60, 121, 255, 0.5)'
+                }}>
+                  <p style={{ fontSize: '24px', fontWeight: 'bold', color: 'white' }}>
+                    Credit intelligence that's transparent, verifiable, and compliant
                   </p>
                 </div>
               </GlowCard>
@@ -904,98 +658,38 @@ const App = () => {
           </Container>
         </section>
 
-        {/* Competitive Advantage */}
-     <section className="relative py-32 px-4">
-        <Container maxWidth="lg" className="relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-6xl font-bold mb-6">
-              <span className="text-[#3C79FF]">18-24 Month</span> First-Mover Window
-            </h2>
-          </div>
-          
-          {/* CHANGE HERE: Added justifyContent="center" to center the grid items */}
-          <Grid container spacing={3} justifyContent="center">
-            {/* CHANGE HERE: Changed md={6} to md={5} to make the column narrower */}
-            <Grid item xs={12} md={3}>
-              <GlowCard glowColor="#A033FF">
-                <div className="bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-10 rounded-2xl border-2 border-[#A033FF]/30 h-full">
-                  <h3 className="text-3xl font-bold mb-8">Competitive Analysis</h3>
-                  <CompetitiveRadar />
-                </div>
-              </GlowCard>
-            </Grid>
-            
-            {/* CHANGE HERE: Changed md={6} to md={5} to match the other column */}
-            <Grid item xs={12} md={3}>
-              <div className="space-y-6">
-                {[
-                  { name: 'Spectral Finance', status: '$6.75M raised, no customers', advantage: 'Credit-specialized, 18mo head start', color: '#3C79FF' },
-                  { name: 'Chainrisk', status: 'Compound-only', advantage: 'Protocol-agnostic, multi-credit', color: '#A033FF' },
-                  { name: 'Traditional Bureaus', status: 'Zero tokenized coverage', advantage: 'Built for 24/7 crypto', color: '#71F5FF' }
-                ].map((competitor, index) => (
-                  <FloatingElement key={index} delay={index * 0.3} duration={3.5}>
-                    <GlowCard glowColor={competitor.color}>
-                      <div className="bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-8 rounded-2xl border-2 border-[#3C79FF]/30 hover:border-[#3C79FF] transition-all duration-500">
-                        <h4 className="text-2xl font-bold mb-3" style={{ color: competitor.color }}>
-                          {competitor.name}
-                        </h4>
-                        <p className="text-gray-400 mb-3">
-                          <span className="font-semibold">Status:</span> {competitor.status}
-                        </p>
-                        <p className="text-gray-300">
-                          <span className="font-semibold text-[#71F5FF]">Our Advantage:</span> {competitor.advantage}
-                        </p>
-                      </div>
-                    </GlowCard>
-                  </FloatingElement>
-                ))}
-              </div>
-            </Grid>
-          </Grid>
-      </Container>
-    </section>
-
-        {/* Financials Section */}
-        <section className="relative py-32 px-4 bg-gradient-to-b from-transparent via-[#1a1847]/30 to-transparent">
-          <Container maxWidth="lg" className="relative z-10">
-            <div className="text-center mb-20">
-              <h2 className="text-6xl font-bold mb-6">
-                Path to{' '}
-                <span className="gradient-shift bg-gradient-to-r from-[#3C79FF] to-[#00FF00] bg-clip-text text-transparent">
-                  $52.5M ARR
-                </span>{' '}
-                by Year 5
+        {/* Network Stats */}
+        <section style={{ position: 'relative', padding: '128px 20px', background: 'linear-gradient(180deg, transparent, rgba(26, 24, 71, 0.3), transparent)' }}>
+          <Container maxWidth="lg" style={{ position: 'relative', zIndex: 10 }}>
+            <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+              <h2 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 'bold', marginBottom: '24px' }}>
+                Network <span className="gradient-text">Stats</span>
               </h2>
             </div>
             
-            <GlowCard glowColor="#3C79FF">
-              <div className="bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-10 rounded-2xl border-2 border-[#3C79FF]/30 mb-12">
-                <RevenueChart />
-                <p className="text-gray-300 text-center mt-6 text-lg">
-                  <span className="text-[#3C79FF] font-bold">Blue:</span> Revenue | 
-                  <span className="text-[#71F5FF] font-bold"> Cyan:</span> EBITDA
-                </p>
-              </div>
-            </GlowCard>
-            
-            <Grid container spacing={6}>
+            <Grid container spacing={4}>
               {[
-                { label: 'CAC', value: '$18K', sublabel: 'Year 5', color: '#3C79FF' },
-                { label: 'LTV', value: '$3.67M', sublabel: 'Lifetime Value', color: '#A033FF' },
-                { label: 'LTV/CAC', value: '204×', sublabel: 'Return Ratio', color: '#71F5FF' },
-                { label: 'Churn', value: '<5%', sublabel: 'Annual', color: '#00FF00' },
-                { label: 'Payback', value: '5mo', sublabel: 'Period', color: '#FF33A0' },
-                // { label: 'Margin', value: '40%', sublabel: 'Year 5 EBITDA', color: '#FFA033' }
-              ].map((metric, index) => (
-                <Grid item xs={6} md={4} key={index}>
-                  <FloatingElement delay={index * 0.1} duration={3}>
-                    <GlowCard glowColor={metric.color}>
-                      <div className="bg-gradient-to-br from-[#1a1847]/80 to-[#0A092A]/50 backdrop-blur-xl p-8 rounded-2xl border border-[#3C79FF]/30 hover:border-[#3C79FF] transition-all text-center">
-                        <div className="text-sm text-gray-400 mb-2">{metric.label}</div>
-                        <div className="text-5xl font-bold mb-2" style={{ color: metric.color }}>
-                          {metric.value}
+                { value: '2.95', unit: 'T', label: 'Target assessed volume by Year 5', color: '#3C79FF' },
+                { value: '50', unit: '-200', label: 'Validator network size', color: '#A033FF' },
+                { value: '60', unit: 's', label: 'Average assessment finality', color: '#71F5FF' },
+                { value: '89.3', unit: '%', label: 'Model accuracy rate', color: '#00FF00' },
+                { value: '4', unit: '', label: 'Chains supported', color: '#FF33A0' }
+              ].map((stat, index) => (
+                <Grid item xs={12} sm={6} md={4} key={index}>
+                  <FloatingElement delay={index * 0.1}>
+                    <GlowCard glowColor={stat.color}>
+                      <div style={{ 
+                        background: 'linear-gradient(135deg, rgba(26, 24, 71, 0.8), rgba(10, 9, 42, 0.5))', 
+                        backdropFilter: 'blur(20px)', 
+                        padding: '32px', 
+                        borderRadius: '16px', 
+                        border: '1px solid rgba(60, 121, 255, 0.3)',
+                        textAlign: 'center'
+                      }}>
+                        <div style={{ fontSize: '48px', fontWeight: 'bold', marginBottom: '8px', color: stat.color }}>
+                          {stat.value}{stat.unit}
                         </div>
-                        <div className="text-sm text-gray-400">{metric.sublabel}</div>
+                        <div style={{ fontSize: '14px', color: '#B8B5D1' }}>{stat.label}</div>
                       </div>
                     </GlowCard>
                   </FloatingElement>
@@ -1005,149 +699,171 @@ const App = () => {
           </Container>
         </section>
 
-        {/* Investment Section */}
-        <section className="relative py-32 px-4">
-          <Container maxWidth="lg" className="relative z-10">
-            <div className="text-center mb-20">
-              <h2 className="text-6xl font-bold mb-6">
-                Pre-Seed SAFT:{' '}
-                <span className="gradient-shift bg-gradient-to-r from-[#3C79FF] to-[#A033FF] bg-clip-text text-transparent">
-                  $160-195K
-                </span>
+        {/* Roadmap */}
+        <section style={{ position: 'relative', padding: '128px 20px' }}>
+          <Container maxWidth="lg" style={{ position: 'relative', zIndex: 10 }}>
+            <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+              <h2 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 'bold', marginBottom: '24px' }}>
+                <span className="gradient-text">Roadmap</span>
               </h2>
             </div>
             
-            <Grid container spacing={8}>
-              <Grid item xs={12} md={6}>
-                <GlowCard glowColor="#3C79FF">
-                  <div className="bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-10 rounded-2xl border-2 border-[#3C79FF]/30 h-full">
-                    <h3 className="text-3xl font-bold mb-8">Investment Terms</h3>
-                    <div className="space-y-6">
-                      {[
-                        { label: 'Structure', value: 'Simple Agreement for Future Tokens' },
-                        { label: 'Amount', value: '$160-195K stablecoin' },
-                        { label: 'Token Price', value: '$0.050 per $DATA' },
-                        { label: 'Allocation', value: '3.2-3.9M tokens (0.32-0.39%)' },
-                        { label: 'Vesting', value: '12-month linear, 6-month cliff' },
-                        { label: 'Next Round', value: 'Seed minimum $0.075 (50% markup)' }
-                      ].map((term, index) => (
-                        <div key={index} className="flex justify-between items-center p-4 bg-[#0A092A]/50 rounded-lg">
-                          <span className="text-gray-400 font-semibold">{term.label}</span>
-                          <span className="text-white font-bold text-right">{term.value}</span>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px', margin: '0 auto' }}>
+              {[
+                { period: '2025 Q2', milestone: 'Testnet launch with pilot protocols' },
+                { period: '2025 Q4', milestone: 'Mainnet launch, validator onboarding' },
+                { period: '2026 Q2', milestone: 'Institutional compliance certifications' },
+                { period: '2026 Q4', milestone: 'Multi-asset class expansion' },
+                { period: '2027+', milestone: 'Global institutional adoption' }
+              ].map((item, index) => (
+                <FloatingElement key={index} delay={index * 0.1}>
+                  <GlowCard glowColor="#3C79FF">
+                    <div style={{ 
+                      background: 'linear-gradient(135deg, rgba(26, 24, 71, 0.9), rgba(10, 9, 42, 0.7))', 
+                      backdropFilter: 'blur(20px)', 
+                      padding: '24px 32px', 
+                      borderRadius: '12px', 
+                      border: '2px solid rgba(60, 121, 255, 0.3)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '24px'
+                    }}>
+                      <div style={{ 
+                        minWidth: '120px',
+                        fontSize: '20px',
+                        fontWeight: 'bold',
+                        color: '#3C79FF'
+                      }}>
+                        {item.period}
+                      </div>
+                      <div style={{ fontSize: '18px', color: '#B8B5D1' }}>
+                        {item.milestone}
+                      </div>
+                    </div>
+                  </GlowCard>
+                </FloatingElement>
+              ))}
+            </div>
+          </Container>
+        </section>
+
+        {/* DLQ Token */}
+        <section style={{ position: 'relative', padding: '128px 20px', background: 'linear-gradient(180deg, transparent, rgba(26, 24, 71, 0.3), transparent)' }}>
+          <Container maxWidth="lg" style={{ position: 'relative', zIndex: 10 }}>
+            <div style={{ textAlign: 'center', marginBottom: '64px' }}>
+              <h2 style={{ fontSize: 'clamp(40px, 6vw, 64px)', fontWeight: 'bold', marginBottom: '24px' }}>
+                DLQ <span className="gradient-text">Token</span>
+              </h2>
+              <p style={{ fontSize: '20px', color: '#B8B5D1', maxWidth: '700px', margin: '0 auto' }}>
+                The DataLiquidity token powers the network
+              </p>
+            </div>
+            
+            <Grid container spacing={4}>
+              {[
+                { title: 'Validator Staking', description: 'Validators must stake DLQ to participate', icon: <Lock size={32} /> },
+                { title: 'Governance', description: 'Token holders vote on protocol parameters', icon: <Users size={32} /> },
+                { title: 'Network Fees', description: 'Discounted assessment fees when paying with DLQ', icon: <TrendingUp size={32} /> },
+                { title: 'Yield Distribution', description: '20% of protocol revenue distributed to stakers', icon: <Target size={32} /> }
+              ].map((item, index) => (
+                <Grid item xs={12} sm={6} key={index}>
+                  <FloatingElement delay={index * 0.15}>
+                    <GlowCard glowColor="#A033FF">
+                      <div style={{ 
+                        background: 'linear-gradient(135deg, rgba(26, 24, 71, 0.9), rgba(10, 9, 42, 0.7))', 
+                        backdropFilter: 'blur(20px)', 
+                        padding: '32px', 
+                        borderRadius: '16px', 
+                        border: '2px solid rgba(160, 51, 255, 0.3)',
+                        height: '100%'
+                      }}>
+                        <div style={{ color: '#A033FF', marginBottom: '16px' }}>
+                          {item.icon}
                         </div>
-                      ))}
-                    </div>
-                  </div>
-                </GlowCard>
-              </Grid>
-              
-              {/* <Grid item xs={12} md={6}>
-                <GlowCard glowColor="#A033FF">
-                  <div className="bg-gradient-to-br from-[#1a1847]/90 to-[#0A092A]/70 backdrop-blur-2xl p-10 rounded-2xl border-2 border-[#A033FF]/30 h-full">
-                    <h3 className="text-3xl font-bold mb-8">Return Scenarios <span className="text-xl text-gray-400">(3-year hold)</span></h3>
-                    <div className="space-y-6">
-                      {[
-                        { scenario: 'Bear', probability: '25%', price: '$0.065', return: '$26K (1.3×)', color: '#FF4444' },
-                        { scenario: 'Base', probability: '55%', price: '$0.180', return: '$72K (3.6×)', color: '#3C79FF' },
-                        { scenario: 'Bull', probability: '20%', price: '$0.350', return: '$140K (7.0×)', color: '#00FF00' },
-                        { scenario: 'Acquisition', probability: '—', price: '$940M val', return: '$300-460K (15-23×)', color: '#A033FF' }
-                      ].map((scenario, index) => (
-                        <div key={index} className="p-6 bg-[#0A092A]/50 rounded-lg border" style={{ borderColor: `${scenario.color}40` }}>
-                          <div className="flex justify-between items-center mb-3">
-                            <span className="text-xl font-bold" style={{ color: scenario.color }}>{scenario.scenario}</span>
-                            <span className="text-sm text-gray-400">{scenario.probability}</span>
-                          </div>
-                          <div className="flex justify-between items-center text-sm mb-2">
-                            <span className="text-gray-400">Token Price</span>
-                            <span className="text-white font-semibold">{scenario.price}</span>
-                          </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-gray-400 text-sm">Return</span>
-                            <span className="text-white font-bold text-lg">{scenario.return}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-8 p-6 bg-gradient-to-r from-[#3C79FF]/20 to-[#A033FF]/20 rounded-lg border-2 border-[#3C79FF]/50">
-                      <p className="text-2xl font-bold text-center">
-                        Expected: <span className="text-[#00FF00]">3.7× (57% IRR)</span>
-                      </p>
-                    </div>
-                  </div>
-                </GlowCard>
-              </Grid> */}
+                        <h3 style={{ fontSize: '22px', fontWeight: 'bold', marginBottom: '12px' }}>{item.title}</h3>
+                        <p style={{ color: '#B8B5D1', fontSize: '15px', lineHeight: 1.6 }}>{item.description}</p>
+                      </div>
+                    </GlowCard>
+                  </FloatingElement>
+                </Grid>
+              ))}
             </Grid>
+            
+            <div style={{ marginTop: '48px', textAlign: 'center' }}>
+              <p style={{ fontSize: '16px', color: '#8B89A0', fontStyle: 'italic' }}>
+                DLQ is a utility token designed for network operation and governance
+              </p>
+            </div>
           </Container>
         </section>
 
         {/* CTA Section */}
-        <section className="relative py-32 px-4 bg-gradient-to-b from-transparent via-[#1a1847]/40 to-[#0A092A]">
-          <Container maxWidth="lg" className="relative z-10">
-            <FloatingElement duration={4}>
+        <section style={{ position: 'relative', padding: '128px 20px' }}>
+          <Container maxWidth="lg" style={{ position: 'relative', zIndex: 10 }}>
+            <FloatingElement>
               <GlowCard glowColor="#3C79FF">
-                <div className="bg-gradient-to-br from-[#1a1847]/95 to-[#0A092A]/80 backdrop-blur-3xl p-16 rounded-3xl border-4 border-[#3C79FF]/50">
-                  <div className="text-center mb-12">
-                    <h2 className="text-6xl font-bold mb-6">
-                      This Is{' '}
-                      <span className="gradient-shift bg-gradient-to-r from-[#3C79FF] via-[#71F5FF] to-[#A033FF] bg-clip-text text-transparent">
-                        Infrastructure
-                      </span>
-                      , Not Speculation
-                    </h2>
-                    <p className="text-2xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-                      If tokenized credit scales to <span className="text-[#3C79FF] font-bold">$500B by 2030</span>, 
-                      every loan needs independent valuation. Auditors mandate external sources. 
-                      <span className="text-[#A033FF] font-bold"> CFOs can't deploy capital without us.</span>
-                    </p>
-                    <p className="text-3xl font-bold text-white mt-8">
-                      We're building that layer.
-                    </p>
-                  </div>
+                <div style={{ 
+                  background: 'linear-gradient(135deg, rgba(26, 24, 71, 0.95), rgba(10, 9, 42, 0.8))', 
+                  backdropFilter: 'blur(30px)', 
+                  padding: '64px', 
+                  borderRadius: '24px', 
+                  border: '4px solid rgba(60, 121, 255, 0.5)',
+                  textAlign: 'center'
+                }}>
+                  <h2 style={{ fontSize: 'clamp(32px, 5vw, 56px)', fontWeight: 'bold', marginBottom: '24px' }}>
+                    Replace Black-Box Models with{' '}
+                    <span className="gradient-text">Verifiable Assessments</span>
+                  </h2>
+                  <p style={{ fontSize: '20px', color: '#B8B5D1', maxWidth: '800px', margin: '0 auto 48px', lineHeight: 1.6 }}>
+                    Building transparent credit infrastructure for institutional capital. 
+                    Addressing the opacity crisis with decentralized validation, AI, and cryptographic proofs.
+                  </p>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-                    <div className="text-center space-y-4">
-                      <div className="text-6xl mb-4">📄</div>
-                      <h3 className="text-2xl font-bold">Read the Whitepaper</h3>
-                      <p className="text-gray-400">Comprehensive technical architecture, market analysis, financial model</p>
-                      <Button 
-                        variant="contained"
-                        size="large"
-                        onClick={openWhitepaper}
-                        className="bg-gradient-to-r from-[#3C79FF] to-[#A033FF] px-8 py-3 font-bold shadow-xl shadow-[#3C79FF]/50 transform transition-all hover:scale-110"
-                        endIcon={<ExternalLink size={20} />}
-                      >
-                        Download Whitepaper
-                      </Button>
-                    </div>
-                    
-                    {/* <div className="text-center space-y-4">
-                      <div className="text-6xl mb-4">🚀</div>
-                      <h3 className="text-2xl font-bold">Request Early Access</h3>
-                      <p className="text-gray-400">Get on the waitlist for production launch (Q3 2025)</p>
-                      <Button 
-                        variant="outlined"
-                        size="large"
-                        className="border-2 border-[#3C79FF] text-[#3C79FF] hover:bg-[#3C79FF]/20 px-8 py-3 font-bold transform transition-all hover:scale-110"
-                        endIcon={<ArrowRight size={20} />}
-                      >
-                        Request Access
-                      </Button>
-                    </div> */}
-                    
-                    <div className="text-center space-y-4">
-                      <div className="text-6xl mb-4">💼</div>
-                      <h3 className="text-2xl font-bold">Participate in Pre-Seed</h3>
-                      <p className="text-gray-400">$160-195K raise closing mid-February 2025</p>
-                      <Button 
-                        variant="contained"
-                        size="large"
-                        href="mailto:amin29199@gmail.com"
-                        className="bg-gradient-to-r from-[#A033FF] to-[#FF33A0] px-8 py-3 font-bold shadow-xl shadow-[#A033FF]/50 transform transition-all hover:scale-110"
-                        endIcon={<Mail size={20} />}
-                      >
-                        Contact Us
-                      </Button>
-                    </div>
+                  <div style={{ display: 'flex', gap: '24px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    <Button 
+                      variant="contained"
+                      size="large"
+                      onClick={openWhitepaper}
+                      style={{ 
+                        background: 'linear-gradient(90deg, #3C79FF, #A033FF)', 
+                        padding: '16px 40px', 
+                        fontSize: '18px', 
+                        fontWeight: 'bold',
+                        boxShadow: '0 8px 32px rgba(60, 121, 255, 0.5)',
+                        transition: 'transform 0.3s ease',
+                        textTransform: 'none'
+                      }}
+                      endIcon={<ExternalLink size={22} />}
+                      onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                    >
+                      Read Whitepaper
+                    </Button>
+                    <Button 
+                      variant="outlined"
+                      size="large"
+                      href="mailto:amin29199@gmail.com"
+                      style={{ 
+                        border: '2px solid #3C79FF', 
+                        color: '#3C79FF', 
+                        padding: '16px 40px', 
+                        fontSize: '18px', 
+                        fontWeight: 'bold',
+                        transition: 'all 0.3s ease',
+                        textTransform: 'none'
+                      }}
+                      endIcon={<Mail size={22} />}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'rgba(60, 121, 255, 0.2)';
+                        e.currentTarget.style.transform = 'scale(1.05)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'transparent';
+                        e.currentTarget.style.transform = 'scale(1)';
+                      }}
+                    >
+                      Contact Us
+                    </Button>
                   </div>
                 </div>
               </GlowCard>
@@ -1156,43 +872,43 @@ const App = () => {
         </section>
 
         {/* Footer */}
-        <footer className="relative py-16 px-4 border-t border-[#3C79FF]/20">
-          <Container maxWidth="lg" className="relative z-10">
+        <footer style={{ position: 'relative', padding: '64px 20px', borderTop: '1px solid rgba(60, 121, 255, 0.2)' }}>
+          <Container maxWidth="lg" style={{ position: 'relative', zIndex: 10 }}>
             <Grid container spacing={6}>
-              <Grid item xs={12} md={4}>
-                <h3 className="text-2xl font-bold mb-4 gradient-shift bg-gradient-to-r from-[#3C79FF] to-[#A033FF] bg-clip-text text-transparent">
-                  CreditLiquidity Protocol
+              <Grid item xs={12} md={6}>
+                <h3 className="gradient-text" style={{ fontSize: '28px', fontWeight: 'bold', marginBottom: '16px' }}>
+                  DataLiquidity Network
                 </h3>
-                <p className="text-gray-400 mb-4">
-                  The Independent Valuation Layer for Tokenized Credit
+                <p style={{ color: '#8B89A0', marginBottom: '24px', lineHeight: 1.6 }}>
+                  Transparent credit intelligence for on-chain finance. 
+                  Building the infrastructure that lending protocols and institutions will run on.
                 </p>
-                <div className="flex gap-4">
-                  <a href="mailto:amin29199@gmail.com" className="text-[#3C79FF] hover:text-[#71F5FF] transition-colors">
-                    <Mail size={24} />
-                  </a>
-                  <a href="https://www.linkedin.com/in/mustapha-amin-dhouib/" className="text-[#3C79FF] hover:text-[#71F5FF] transition-colors">
-                    <ExternalLink size={24} /> Founder Linkedin
+                <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                  <Mail size={20} style={{ color: '#3C79FF' }} />
+                  <a href="mailto:amin29199@gmail.com" style={{ color: '#3C79FF', textDecoration: 'none', transition: 'color 0.3s' }}>
+                    amin29199@gmail.com
                   </a>
                 </div>
               </Grid>
               
- 
-              
-              <Grid item xs={12} md={4}>
-                <h4 className="text-lg font-bold mb-4 text-[#71F5FF]">Legal</h4>
-                <p className="text-gray-400 text-sm mb-4">
-                  Dubai VARA entity (formation in progress)
-                </p>
-                <p className="text-gray-500 text-xs leading-relaxed">
-                  Disclaimer: $DATA is a utility token, not a security. High risk of total loss. 
-                  Past performance does not guarantee future results. This is not investment advice.
-                </p>
+              <Grid item xs={12} md={6}>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ color: '#8B89A0', marginBottom: '16px' }}>
+                    <strong style={{ color: '#B8B5D1' }}>Founded:</strong> 2025
+                  </p>
+                  <p style={{ color: '#8B89A0', marginBottom: '16px' }}>
+                    <strong style={{ color: '#B8B5D1' }}>Location:</strong> Dubai DIFC
+                  </p>
+                  <p style={{ color: '#8B89A0', fontSize: '14px', marginTop: '32px' }}>
+                    Mission: Replace black-box credit models with verifiable, transparent assessments
+                  </p>
+                </div>
               </Grid>
             </Grid>
             
-            <div className="mt-12 pt-8 border-t border-[#3C79FF]/20 text-center">
-              <p className="text-gray-500 text-sm">
-                © 2025 CreditLiquidity Protocol. All rights reserved.
+            <div style={{ marginTop: '48px', paddingTop: '32px', borderTop: '1px solid rgba(60, 121, 255, 0.2)', textAlign: 'center' }}>
+              <p style={{ color: '#6B6980', fontSize: '14px' }}>
+                © 2025 DataLiquidity Network. All rights reserved.
               </p>
             </div>
           </Container>
